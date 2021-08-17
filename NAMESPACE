@@ -1,0 +1,4 @@
+exportPattern("^[[:alpha:]]+")
+importFrom("stats", "as.formula", "gaussian", "glm", "is.empty.model",
+               "model.matrix", "model.response", "na.omit", "pt", "time",
+               "vcov")
