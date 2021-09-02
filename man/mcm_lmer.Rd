@@ -2,8 +2,8 @@
 % Please edit documentation in R/mcm_lmer.R
 \name{mcm_lmer}
 \alias{mcm_lmer}
-\title{Estimate and Test Inter-generational Mobility Effect
-with Longitudinal Data}
+\title{Estimate and Test Intergenerational Social Mobility Effect using the Mobility Contrast Model for 
+Longitudinal Data}
 \usage{
 mcm_lmer(
   formula,
@@ -59,9 +59,9 @@ containing the variables in the model. If not found in data,
 the variables are taken from environment(formula),
 typically the environment from which the function is called.}
 
-\item{REML}{logical. Should the estimates be chosen be optimize the
+\item{REML}{logical, indicating whether the estimates should be chosen to optimize the
 restricted log-likelihood (REML) criterial (as opposed to the
-log-likelihood)?}
+log-likelihood).}
 
 \item{control}{Inherit from \code{lme4} package. It is a list (of correct
 class, resulting from lmerControl() or glmerControl() respectively)
@@ -84,14 +84,13 @@ to fit the model.}
 be used in the fitting process.
 Should be NULL or a numeric vector.}
 
-\item{na.action}{a function which indicates what should
-happen when the data contain NAs.The default is set by the
+\item{na.action}{a function indicating actions to be taken for data contain NAs.The default is set by the
 \code{na.action} setting in \code{options} and is
 \code{na.fail} if that is unset.}
 
 \item{offset}{Inherit from \code{lme4} package. This can be used
 to specify an a priori known component to be included in the linear
-predictor during fitting. This should be NULL or a numeric vector
+predictor during fitting. It should be NULL or a numeric vector
 of length equal to the number of cases. One or more offset
 terms can be included in the formula instead or as well,
 and if more than one is specified their sum is used.}
@@ -99,7 +98,7 @@ and if more than one is specified their sum is used.}
 \item{contrasts}{an optional list. The default is set as sum-to-zero
 contrast.}
 
-\item{devFunOnly}{logical - return only the deviance evaluation function.}
+\item{devFunOnly}{logical; return only the deviance evaluation function.}
 
 \item{origin}{a character indicating the column name of origin.}
 
@@ -107,30 +106,27 @@ contrast.}
 
 \item{time}{a character indicating the time when individual was observed}
 
-\item{displayresult}{logical. Should model results be displayed
-after estimation. The default is \code{TRUE}.}
+\item{displayresult}{logical, indicating whether the original multilevel model results should be displayed. 
+                     The default is \code{TRUE}.}
 
 \item{\dots}{additional arguments to be passed to the function.}
 }
 \value{
 A list containing:
-\item{model}{Fitted generalized models of outcome on predictors.
+\item{model}{Fitted multilevel models.
 See more on function \code{glm} in package \code{stats}.}
-\item{estimates}{Estimated mobility effects.}
-\item{se}{Standard errors of the estimated mobility effects.}
+\item{estimates}{Mobility effects estimates.}
+\item{se}{Standard errors of the mobility effects estimates.}
 \item{significance}{Statistical significance of the the
-estimated mobility effects.}
-\item{esti_3way}{Estimated mobility effects conditional
-on specific age.}
-\item{se_3way}{Standard errors of the estimated mobility
-effects conditional specific age.}
-\item{sig_3way}{Statistical significance of the the
-estimated mobility effects conditional on age.}
+mobility effects estimates.}
+\item{esti_3way}{Mobility effects estimates for a given age.}
+\item{se_3way}{Standard errors of the mobility
+effects estimates for a given specific age.}
+\item{sig_3way}{Statistical significance of the mobility effects estimates for a given age.}
 }
 \description{
 This function fits a multilevel mobility contrast model
-to estimate and test inter-generational mobility effect
-on an outcome in longitudinal data.
+to estimate and test intergenerational mobility effects using the mobility contrast model for ongitudinal data.
 }
 \examples{
 library(MCM)

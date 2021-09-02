@@ -5,12 +5,11 @@
 Simulated Data Studying Social Mobility (Longitudinal)
 }
 \description{
-This is a simulated data used to study social mobility under
-longitudinal setting.
+A simulated longtitudinal dataset of intergeenrational social mobility.
 }
 \usage{data("sim_datlmer")}
 \format{
-  A data frame with 50000 observations on the following 14 variables.
+  A data frame with 50,000 observations and 14 variables.
   \describe{
     \item{\code{id}}{an ordered factor with levels}
     \item{\code{obs}}{a numeric vector}

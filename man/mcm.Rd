@@ -2,7 +2,7 @@
 % Please edit documentation in R/mcm.R
 \name{mcm}
 \alias{mcm}
-\title{Estimate and Test Inter-generational Social Mobility
+\title{Estimate and Test Intergenerational Social Mobility using the Mobility Contrast Model
 Effect on an Outcome}
 \usage{
 mcm(
@@ -24,7 +24,7 @@ mcm(
 \arguments{
 \item{formula}{an object of class "formula" (or one that can
 be coerced to that class): a symbolic description of the model
-to be fitted. A typical model used in studying social mobility
+to be fit. A typical model used in studying intergenerational social mobility
 takes the form \code{response ~ origin*destination}, where
 \code{respose} is the numeric response vector and \code{origin}
 (\code{destination}) is a vector indicating the origin (destination).
@@ -41,7 +41,7 @@ the variables are taken from environment(formula),
 typically the environment from which the function is called.}
 
 \item{weights}{an optional vector of ‘prior weights’ to
-be used in the fitting process.
+be used in the model fitting process.
 Should be NULL or a numeric vector.}
 
 \item{na.action}{a function which indicates what should
@@ -60,7 +60,7 @@ to be used in the model.}
 \item{contrasts}{an optional list. The default is set as sum-to-zero
 contrast.}
 
-\item{gee}{logical. Should gee be used in estimating the model?}
+\item{gee}{logical. Should the Generalized Estimating Equation (GEE) be used?}
 
 \item{id}{a vector which identifies the clusters, which is required while
 \code{gee} is used. The length of \code{id} should be the same as
@@ -76,17 +76,18 @@ The following are permitted: \code{"independence"},
 \code{"non_stat_M_dep"}, \code{"exchangeable"},
 \code{"AR-M"} and \code{"unstructured"}.}
 
-\item{displayresult}{logical. Should model results be displayed
-after estimation. The default is \code{TRUE}.}
+\item{displayresult}{logical, indicating whether the generalized linear model results 
+                     based on which the MCM estimates are generated should be displayed. 
+                     The default is \code{TRUE}.}
 
 \item{\dots}{additional arguments to be passed to the function.}
 }
 \value{
 A list containing:
-\item{model}{Fitted generalized models of outcome on predictors.
+\item{model}{Fitted generalized linear model of outcome on predictors.
 See more on function \code{glm} in package \code{stats}.}
-\item{estimates}{Estimated mobility effects.}
-\item{se}{Standard errors of the estimated mobility effects.}
+\item{estimates}{Mobility effects estimates.}
+\item{se}{Standard errors of the mobility effects estimates.}
 \item{significance}{Statistical significance of the the
 estimated mobility effects.}
 }
