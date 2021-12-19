@@ -1,3 +1,110 @@
+#' Estimate and Test Inter-generational Mobility Effect
+#' with Longitudinal Data
+#'
+#' This function fits a multilevel mobility contrast model
+#' to estimate and test inter-generational mobility effect
+#' on an outcome in longitudinal data.
+#'
+#'
+#' @param formula Inherit the function form from \code{lme4}
+#' package. It is a two-sided linear formula
+#' object describing both the fixed-effects and
+#' random-effects part of the model, with the response
+#' on the left of a \code{~} operator and the terms,
+#' separated by + operators, on the right.
+#' Random-effects terms are distinguished by vertical
+#' bars (\code{|}) separating expressions for design
+#' matrices from grouping factors.
+#' Two vertical bars (\code{||}) can be used to specify
+#' multiple uncorrelated random effects for the same
+#' grouping variable. (Because of the way it is implemented,
+#' the \code{||}-syntax works only for design matrices
+#' containing numeric (continuous) predictors;
+#' to fit models with independent categorical effects,
+#' see dummy or the lmer_alt function from the \code{afex}
+#' package.) A typical model used in studying social mobility with
+#' longitudinal data
+#' takes the form \code{response ~ origin*destination + | id}, where
+#' \code{respose} is the numeric response vector and \code{origin}
+#' (\code{destination}) is a vector indicating the origin (destination).
+#' The specification of \code{origin*destination} indicates the cross of
+#' \code{origin} and \code{destination}, which is the same as \code{
+#' origin + destination + origin:destination} where
+#' \code{origin:destination} indicates the interaction of \code{origin}
+#' and \code{destination}. \code{id} is a identifier for the clusters.
+#' @param data an optional data frame, list or environment
+#' (or object coercible by as.data.frame to a data frame)
+#' containing the variables in the model. If not found in data,
+#' the variables are taken from environment(formula),
+#' typically the environment from which the function is called.
+#' @param REML logical. Should the estimates be chosen be optimize the
+#' restricted log-likelihood (REML) criterial (as opposed to the
+#' log-likelihood)?
+#' @param origin a character indicating the column name of origin.
+#' @param destination a character indicating the column name of destination.
+#' @param time a character indicating the time when individual was observed
+#' @param control Inherit from \code{lme4} package. It is a list (of correct
+#' class, resulting from lmerControl() or glmerControl() respectively)
+#' containing control parameters, including the nonlinear optimizer to
+#' be used and parameters to be passed through to the nonlinear optimizer,
+#' see the \code{lmerControl} documentation in \code{lme4} package for details.
+#' @param start Inherit from \code{lme4} package. It is a named list of
+#' starting values for the parameters in the model.
+#' @param verbose Inherit from \code{lme4} package. It is an integer scalar.
+#' If > 0 verbose output is generated during the optimization of the parameter
+#' estimates. If > 1 verbose output is generated during the individual
+#' penalized iteratively reweighted least squares (PIRLS) steps.
+#' @param subset optional expression selecting the subset of the rows of data
+#' to fit the model.
+#' @param weights an optional vector of ‘prior weights’ to
+#' be used in the fitting process.
+#' Should be NULL or a numeric vector.
+#' @param na.action a function which indicates what should
+#' happen when the data contain NAs.The default is set by the
+#' \code{na.action} setting in \code{options} and is
+#' \code{na.fail} if that is unset.
+#' @param offset Inherit from \code{lme4} package. This can be used
+#' to specify an a priori known component to be included in the linear
+#' predictor during fitting. This should be NULL or a numeric vector
+#' of length equal to the number of cases. One or more offset
+#' terms can be included in the formula instead or as well,
+#' and if more than one is specified their sum is used.
+#' @param contrasts an optional list. The default is set as sum-to-zero
+#' contrast.
+#' @param devFunOnly logical - return only the deviance evaluation function.
+#' @param displayresult logical. Should model results be displayed
+#' after estimation. The default is \code{TRUE}.
+#' @param \dots additional arguments to be passed to the function.
+#'
+#' @return A list containing:
+#' \item{model}{Fitted generalized models of outcome on predictors.
+#' See more on function \code{glm} in package \code{stats}.}
+#' \item{estimates}{Estimated mobility effects.}
+#' \item{se}{Standard errors of the estimated mobility effects.}
+#' \item{significance}{Statistical significance of the the
+#' estimated mobility effects.}
+#' \item{esti_3way}{Estimated mobility effects conditional
+#' on specific age.}
+#' \item{se_3way}{Standard errors of the estimated mobility
+#' effects conditional specific age.}
+#' \item{sig_3way}{Statistical significance of the the
+#' estimated mobility effects conditional on age.}
+#'
+#'
+#' @examples
+#' library(MCM)
+#' library(lme4)
+#' data("sim_datlmer")
+#' fit_mcm_lmer <- mcm_lmer(yij ~ origin*destination*age +
+#'                            (1|id), data = sim_datlmer,
+#'                          origin = "origin",
+#'                          destination = "destination",
+#'                          time = "age")
+#'
+#'
+
+
+
 
 mcm_lmer <- function(formula, data = NULL,
                      REML = TRUE,
@@ -81,8 +188,10 @@ mcm_lmer <- function(formula, data = NULL,
   trans.matrix = trans.matrix[!duplicated(trans.matrix),]
 
   # all interaction estimates and se's
-  ia_1 = broomExtra::tidy(model)$estimate[c(grep(twoway, broomExtra::tidy(model)$term ))]
-  names(ia_1) <- broomExtra::tidy(model)$term[c(grep(twoway, broomExtra::tidy(model)$term ))]
+  coefficienttable <- data.frame(term = parameters::model_parameters(model)$Parameter,
+                                 estimate = parameters::model_parameters(model)$Coefficient)
+  ia_1 = coefficienttable$estimate[c(grep(twoway, coefficienttable$term ))]
+  names(ia_1) <- coefficienttable$term[c(grep(twoway, coefficienttable$term ))]
   ia_2 = vcov(model)[c(grep(twoway,
                             rownames(vcov(model)))),c(grep(twoway, rownames(vcov(model))))]
 
@@ -111,7 +220,7 @@ mcm_lmer <- function(formula, data = NULL,
 
   # compute mobility effect significance
   # ask this residual things
-  mtp = pt(-abs(mtesti/mtse), (nrow(model@frame)-nrow( broomExtra::tidy(model) ) + 1) )*2 #p-values
+  mtp = pt(-abs(mtesti/mtse), (nrow(model@frame)-nrow( coefficienttable ) + 1) )*2 #p-values
   mtp = matrix(mtp, Orig,Desti)
 
   mtsig = rep('   ', Orig*Desti); mtsig[mtp<.05] = '*  '; mtsig[mtp<.01] = '** '; mtsig[mtp<.001] = '***'
@@ -122,10 +231,10 @@ mcm_lmer <- function(formula, data = NULL,
   # compute transformation matrix for three-way interactions -----
   # if age is continuous, there is no need to fill in the missed category
   threeway <- paste0("^",origin,"([0-9]*):",destination,"([0-9]*):",time,"$","|","^",time,":",origin,"([0-9]*):",destination,"([0-9]*)$")
-  ia3_1 = broomExtra::tidy(model)$estimate[stringr::str_which(broomExtra::tidy(model)$term,threeway)]
-  ia3_2 = vcov(model)[stringr::str_subset(broomExtra::tidy(model)$term,threeway),
-                      stringr::str_subset(broomExtra::tidy(model)$term,threeway)]
-  # broomExtra::tidy(model)[str_which(broomExtra::tidy(model)$term,threeway),]
+  ia3_1 = coefficienttable$estimate[stringr::str_which(coefficienttable$term,threeway)]
+  ia3_2 = vcov(model)[stringr::str_subset(coefficienttable$term,threeway),
+                      stringr::str_subset(coefficienttable$term,threeway)]
+  # parameters::Coefficient(model)[str_which(parameters::Coefficient(model)$term,threeway),]
   iaesti3 = as.vector(trans.matrix%*%ia3_1)
   iavcov3 = trans.matrix%*%ia3_2%*%t(trans.matrix)
 
@@ -149,7 +258,7 @@ mcm_lmer <- function(formula, data = NULL,
 
   # compute mobility effect significance
   # ask this residual things
-  mtp = pt(-abs(mtesti3/mtse3), (nrow(model@frame)-nrow(broomExtra::tidy(model)) + 1) )*2 #p-values
+  mtp = pt(-abs(mtesti3/mtse3), (nrow(model@frame)-nrow(coefficienttable) + 1) )*2 #p-values
   mtp3 = mtp = matrix(mtp, Orig,Desti)
 
   mtsig = rep('   ', Orig*Desti); mtsig[mtp<.05] = '*  '; mtsig[mtp<.01] = '** '; mtsig[mtp<.001] = '***'

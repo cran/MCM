@@ -1,6 +1,74 @@
+#' Estimate and Test Inter-generational Social Mobility
+#' Effect on an Outcome
+#'
+#' This function implements the mobility contrast model
+#' designed for estimating and testing inter-generational
+#' mobility effect on an outcome.
+#'
+#' @param formula an object of class "formula" (or one that can
+#' be coerced to that class): a symbolic description of the model
+#' to be fitted. A typical model used in studying social mobility
+#' takes the form \code{response ~ origin*destination}, where
+#' \code{respose} is the numeric response vector and \code{origin}
+#' (\code{destination}) is a vector indicating the origin (destination).
+#' The specification of \code{origin*destination} indicates the cross of
+#' \code{origin} and \code{destination}, which is the same as \code{
+#' origin + destination + origin:destination} where
+#' \code{origin:destination} indicates the interaction of \code{origin}
+#' and \code{destination}.
+#'
+#' @param data an optional data frame, list or environment
+#' (or object coercible by as.data.frame to a data frame)
+#' containing the variables in the model. If not found in data,
+#' the variables are taken from environment(formula),
+#' typically the environment from which the function is called.
+#' @param origin a character indicating the column name of origin.
+#' @param destination a character indicating the column name of destination.
+#' @param weights an optional vector of ‘prior weights’ to
+#' be used in the fitting process.
+#' Should be NULL or a numeric vector.
+#' @param na.action a function which indicates what should
+#' happen when the data contain NAs.The default is set by the
+#' \code{na.action} setting in \code{options} and is
+#' \code{na.fail} if that is unset.
+#' @param family a character string, a function or the result of a call
+#' to a family function describing the error distribution and link function
+#' to be used in the model.
+#' @param contrasts an optional list. The default is set as sum-to-zero
+#' contrast.
+#' @param gee logical. Should gee be used in estimating the model?
+#' @param id a vector which identifies the clusters, which is required while
+#' \code{gee} is used. The length of \code{id} should be the same as
+#' the number of observations. Data are assumed to be sorted
+#' so that observations on a cluster are contiguous rows for
+#' all entities in the formula.
+#' @param corstr a character string specifying
+#' the correlation structure.
+#' The following are permitted: \code{"independence"},
+#' \code{"fixed"},
+#' \code{"stat_M_dep"},
+#' \code{"non_stat_M_dep"}, \code{"exchangeable"},
+#' \code{"AR-M"} and \code{"unstructured"}.
+#' @param displayresult logical. Should model results be displayed
+#' after estimation. The default is \code{TRUE}.
+#' @param \dots additional arguments to be passed to the function.
+#'
+#' @return A list containing:
+#' \item{model}{Fitted generalized models of outcome on predictors.
+#' See more on function \code{glm} in package \code{stats}.}
+#' \item{estimates}{Estimated mobility effects.}
+#' \item{se}{Standard errors of the estimated mobility effects.}
+#' \item{significance}{Statistical significance of the the
+#' estimated mobility effects.}
+#'
+#' @examples
+#' library(MCM)
+#' data('sim_moderate_het')
+#' mcm(response ~ origin * destination, data = sim_moderate_het,
+#'     origin = "origin",destination="destination")
 
 # mcm function used to estimate the mobility effect
-mcm <- function(formula, data, weights, na.action=na.omit,
+mcm <- function(formula, data, weights=1, na.action=na.omit,
                 origin,destination,family = gaussian(),
                 contrasts = NULL,
                 # contrasts = list(origin = "contr.sum",origin = "contr.sum"),
@@ -66,11 +134,15 @@ mcm <- function(formula, data, weights, na.action=na.omit,
   if(gee==TRUE){
     temp6 = gee::gee(formula,
                      id = id,#id = get(id),
-                     data = fm,
+                     data = mf,
                      family = fam,
                      corstr = corstr)
   }else{
-    temp6 = glm(formula, mf, family = fam)
+    # temp6 = glm(formula, mf, family = fam)
+    temp6 = survey::svyglm(formula, design=survey::svydesign(ids=~1,
+                                                             strata = NULL,
+                                                             weights=~weights,
+                                                 data=mf), family=fam)
   }
   # compute transformation matrix
   # trans.matrix = model.matrix(mt, mf, contrasts)
