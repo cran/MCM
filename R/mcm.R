@@ -24,8 +24,8 @@
 #' typically the environment from which the function is called.
 #' @param origin a character indicating the column name of origin.
 #' @param destination a character indicating the column name of destination.
-#' @param weights an optional vector of ‘prior weights’ to
-#' be used in the fitting process.
+#' @param weights an optional vector of unit-level sampling weights to
+#' be used in analysis.
 #' Should be NULL or a numeric vector.
 #' @param na.action a function which indicates what should
 #' happen when the data contain NAs.The default is set by the
@@ -80,15 +80,15 @@ mcm <- function(formula, data, weights=1, na.action=na.omit,
   op <- options(contrasts=c("contr.sum","contr.sum"), na.action = na.omit)
   on.exit(options(op))
 
-  fam <- family
   if (is.character(family))
-    fam <- get(family, mode = "function", envir = parent.frame())
+    family <- get(family, mode = "function", envir = parent.frame())
   if (is.function(family))
-    fam <- family()
+    family <- family()
   if (is.null(family$family)) {
     print(family)
     stop("'family' not recognized")
   }
+  fam <- family
   # parse formula
   cl <- match.call()
   mf <- match.call(expand.dots = FALSE)

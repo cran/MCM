@@ -1,7 +1,7 @@
 Package: MCM
 Type: Package
 Title: Estimating and Testing Intergenerational Social Mobility Effect
-Version: 0.1.4
+Version: 0.1.5
 Authors@R: c(person("Jiahui", "Xu",email = "jpx5053@psu.edu", role = c("aut", "cre")),
               person("Liying",  "Luo", email = "liyingluo@psu.edu", role = "aut") )
 Maintainer: Jiahui Xu <jpx5053@psu.edu>
@@ -12,9 +12,9 @@ Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.1.1
 NeedsCompilation: no
-Packaged: 2021-12-19 19:17:38 UTC; xujiahui
+Packaged: 2022-01-05 03:25:45 UTC; xujiahui
 Author: Jiahui Xu [aut, cre],
   Liying Luo [aut]
 Depends: R (>= 3.5.0)
 Repository: CRAN
-Date/Publication: 2021-12-19 19:32:03 UTC
+Date/Publication: 2022-01-05 03:50:10 UTC

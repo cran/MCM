@@ -40,8 +40,8 @@ containing the variables in the model. If not found in data,
 the variables are taken from environment(formula),
 typically the environment from which the function is called.}
 
-\item{weights}{an optional vector of ‘prior weights’ to
-be used in the fitting process.
+\item{weights}{an optional vector of unit-level sampling weights to
+be used in analysis.
 Should be NULL or a numeric vector.}
 
 \item{na.action}{a function which indicates what should
