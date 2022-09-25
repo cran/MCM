@@ -85,9 +85,11 @@ after estimation. The default is \code{TRUE}.}
 A list containing:
 \item{model}{Fitted generalized models of outcome on predictors.
 See more on function \code{glm} in package \code{stats}.}
-\item{estimates}{Estimated mobility effects.}
-\item{se}{Standard errors of the estimated mobility effects.}
-\item{significance}{Statistical significance of the the
+\item{origin_main}{Estimated main effects of origin.}
+\item{destination_main}{Estimated main effects of destination.}
+\item{mobility_estimates}{Estimated mobility effects.}
+\item{mobility_se}{Standard errors of the estimated mobility effects.}
+\item{mobility_sig}{Statistical significance of the the
 estimated mobility effects.}
 }
 \description{

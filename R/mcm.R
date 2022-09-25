@@ -56,9 +56,11 @@
 #' @return A list containing:
 #' \item{model}{Fitted generalized models of outcome on predictors.
 #' See more on function \code{glm} in package \code{stats}.}
-#' \item{estimates}{Estimated mobility effects.}
-#' \item{se}{Standard errors of the estimated mobility effects.}
-#' \item{significance}{Statistical significance of the the
+#' \item{origin_main}{Estimated main effects of origin.}
+#' \item{destination_main}{Estimated main effects of destination.}
+#' \item{mobility_estimates}{Estimated mobility effects.}
+#' \item{mobility_se}{Standard errors of the estimated mobility effects.}
+#' \item{mobility_sig}{Statistical significance of the the
 #' estimated mobility effects.}
 #'
 #' @examples
@@ -66,6 +68,7 @@
 #' data('sim_moderate_het')
 #' mcm(response ~ origin * destination, data = sim_moderate_het,
 #'     origin = "origin",destination="destination")
+#' @export
 
 # mcm function used to estimate the mobility effect
 mcm <- function(formula, data, weights=1, na.action=na.omit,
@@ -155,6 +158,10 @@ mcm <- function(formula, data, weights=1, na.action=na.omit,
   mf <- mf[order(mf$origin),]
 
   trans.matrix = model.matrix(as.formula(paste0("~",origin,"*",destination)),mf)
+  maino_trans.matrix = trans.matrix[,stringr::str_subset(colnames(trans.matrix), "^origin([0-9]*)$")]
+  maino_trans.matrix = maino_trans.matrix[!duplicated(maino_trans.matrix),]
+  maind_trans.matrix = trans.matrix[,stringr::str_subset(colnames(trans.matrix), "^destination([0-9]*)$")]
+  maind_trans.matrix = maind_trans.matrix[!duplicated(maind_trans.matrix),]
   trans.matrix = trans.matrix[,stringr::str_subset(colnames(trans.matrix),twoway )]
   trans.matrix = trans.matrix[!duplicated(trans.matrix),]
 
@@ -162,14 +169,34 @@ mcm <- function(formula, data, weights=1, na.action=na.omit,
   if(gee==TRUE){
     ia_1 = temp6$coefficients[c(grep(paste0(":",destination), rownames(temp6$robust.variance)))]
     ia_2 = temp6$robust.variance[c(grep(paste0(":",destination), rownames(temp6$robust.variance))),c(grep(paste0(":",destination), rownames(temp6$robust.variance)))]
+    maino_1 = temp6$coefficients[c(grep(paste0("^",origin,"[0-9]*$"), rownames(temp6$robust.variance)))]
+    maino_2 = temp6$robust.variance[c(grep(paste0("^",origin,"[0-9]*$"), rownames(temp6$robust.variance))),c(grep(paste0("^",origin,"[0-9]*$"), rownames(temp6$robust.variance)))]
+    maind_1 = temp6$coefficients[c(grep(paste0("^",destination,"[0-9]*$"), rownames(temp6$robust.variance)))]
+    maind_2 = temp6$robust.variance[c(grep(paste0("^",destination,"[0-9]*$"), rownames(temp6$robust.variance))),c(grep(paste0("^",destination,"[0-9]*$"), rownames(temp6$robust.variance)))]
   }else{
     ia_1 = temp6$coefficients[c(grep(paste0(":",destination), rownames(vcov(temp6))))]
     ia_2 = vcov(temp6)[c(grep(paste0(":",destination), rownames(vcov(temp6)))),c(grep(paste0(":",destination), rownames(vcov(temp6))))]
+    maino_1 = temp6$coefficients[c(grep(paste0("^",origin,"[0-9]*$"), rownames(vcov(temp6))))]
+    maino_2 = vcov(temp6)[c(grep(paste0("^",origin,"[0-9]*$"), rownames(vcov(temp6)))),c(grep(paste0("^",origin,"[0-9]*$"), rownames(vcov(temp6))))]
+    maind_1 = temp6$coefficients[c(grep(paste0("^",destination,"[0-9]*$"), rownames(vcov(temp6))))]
+    maind_2 = vcov(temp6)[c(grep(paste0("^",destination,"[0-9]*$"), rownames(vcov(temp6)))),c(grep(paste0("^",destination,"[0-9]*$"), rownames(vcov(temp6))))]
   }
 
   # trans.matrix <- trans.matrix[,match(names(ia_1),colnames(trans.matrix))]
   iaesti = as.vector(trans.matrix%*%ia_1)
   iavcov = trans.matrix%*%ia_2%*%t(trans.matrix)
+  maino_esti = as.vector(maino_trans.matrix%*%maino_1)
+  maino_vcov = sqrt(diag(maino_trans.matrix%*%maino_2%*%t(maino_trans.matrix)))
+  mtp_o = pt(-abs(maino_esti/maino_vcov), temp6$df.residual)*2 #p-values
+  mtsig_o = rep('   ', Orig); mtsig_o[mtp_o<.05] = '*  '; mtsig_o[mtp_o<.01] = '** '; mtsig_o[mtp_o<.001] = '***'
+  maino = data.frame(main_effects_origin=maino_esti,se=maino_vcov,sig=mtsig_o)
+  rownames(maino) = paste0("Orig",1:nrow(maino))
+  maind_esti = as.vector(maind_trans.matrix%*%maind_1)
+  maind_vcov = sqrt(diag(maind_trans.matrix%*%maind_2%*%t(maind_trans.matrix)))
+  mtp_d = pt(-abs(maind_esti/maind_vcov), temp6$df.residual)*2 #p-values
+  mtsig_d = rep('   ', Desti); mtsig_d[mtp_d<.05] = '*  '; mtsig_d[mtp_o<.01] = '** '; mtsig_d[mtp_d<.001] = '***'
+  maind = data.frame(main_effects_destination=maind_esti,se=maind_vcov,sig=mtsig_d)
+  rownames(maind) = paste0("Desti",1:nrow(maind))
 
   # mobility contrast and get the mobility effect estimates and SEs
 byrow_matrix_esti <- lapply(1:Orig,function(i){
@@ -219,7 +246,9 @@ if(displayresult==TRUE){
 }
 
   list(model = temp6,
-       estimates = mtesti,
-       se = mtse,
-       significance = mtsig)
+       origin_main = maino,
+       destination_main = maind,
+       mobility_estimates = mtesti,
+       mobility_se = mtse,
+       mobility_sig = mtsig)
 }

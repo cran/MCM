@@ -1,12 +1,12 @@
-f0008823e936d75a16160334f51f5e56 *DESCRIPTION
+708473d2a4e3af13fa00b8a3397d21e4 *DESCRIPTION
 e98726b573d9e6c454cc87a329c6646e *NAMESPACE
 0926be73b96f78c4981c49dca5b64a3e *R/globals.R
-ff78b91a1f6129710203cced59cc2187 *R/mcm.R
+31aa699ed082803889c9ab589af8d664 *R/mcm.R
 6c87886d9bdabb7768ea4e3be57d2947 *R/mcm_lmer.R
 bf3c4c7550587b4142d8f9ea04f9f9e9 *data/sim_datlmer.rda
 6e2378b1b73258591f61a267d8cf3546 *data/sim_moderate_het.rda
-3c647cc55125cd2fbcfd839a71f7e58a *man/mcm.Rd
+110cab025f93007b528e1b2f69cb2a69 *man/mcm.Rd
 abadefedcad2cdfa31052432538eb65a *man/mcm_lmer.Rd
 128ee774fcc37f9e39893e891731fca9 *man/sim_datlmer.Rd
 19a307f76265d24af4b87e997bf3651a *man/sim_moderate_het.Rd
-68d692ff06e04cd6c3ae993b97a1fe3d *tests/mcm_package_test.R
+c61bda1548a8ce54e481e2bc5c53170d *tests/mcm_package_test.R
