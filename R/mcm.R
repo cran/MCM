@@ -158,9 +158,9 @@ mcm <- function(formula, data, weights=1, na.action=na.omit,
   mf <- mf[order(mf$origin),]
 
   trans.matrix = model.matrix(as.formula(paste0("~",origin,"*",destination)),mf)
-  maino_trans.matrix = trans.matrix[,stringr::str_subset(colnames(trans.matrix), "^origin([0-9]*)$")]
+  maino_trans.matrix = trans.matrix[,stringr::str_subset(colnames(trans.matrix), paste0("^",origin,"([0-9]*)$"))]
   maino_trans.matrix = maino_trans.matrix[!duplicated(maino_trans.matrix),]
-  maind_trans.matrix = trans.matrix[,stringr::str_subset(colnames(trans.matrix), "^destination([0-9]*)$")]
+  maind_trans.matrix = trans.matrix[,stringr::str_subset(colnames(trans.matrix), paste0("^",destination,"([0-9]*)$"))]
   maind_trans.matrix = maind_trans.matrix[!duplicated(maind_trans.matrix),]
   trans.matrix = trans.matrix[,stringr::str_subset(colnames(trans.matrix),twoway )]
   trans.matrix = trans.matrix[!duplicated(trans.matrix),]
